@@ -1,0 +1,16 @@
+apiVersion: v2
+name: youtube-to-mp3
+description: A Helm chart for YouTube to MP3 converter service
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - youtube
+  - mp3
+  - converter
+  - fastapi
+maintainers:
+  - name: amahmuzic3
+    email: your-email@example.com
+sources:
+  - https://github.com/your-username/youtube-to-mp3

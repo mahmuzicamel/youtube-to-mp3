@@ -1,0 +1,46 @@
+name: Cleanup
+
+on:
+  schedule:
+    - cron: '0 4 * * 0'  # Weekly on Sunday at 4 AM
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  cleanup-images:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Delete old container images
+      uses: actions/delete-package-versions@v4
+      with:
+        package-name: ${{ env.IMAGE_NAME }}
+        package-type: 'container'
+        min-versions-to-keep: 10
+        delete-only-untagged-versions: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  cleanup-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Delete old workflow artifacts
+      uses: c-hive/gha-remove-artifacts@v1
+      with:
+        age: '30 days'
+        skip-tags: true
+        skip-recent: 5
+
+  cleanup-caches:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Cleanup old caches
+      run: |
+        # Get list of caches
+        gh api repos/${{ github.repository }}/actions/caches --jq '.actions_caches[] | select(.created_at < (now - (30 * 24 * 3600))) | .id' | \
+        xargs -I {} gh api --method DELETE repos/${{ github.repository }}/actions/caches/{} || true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

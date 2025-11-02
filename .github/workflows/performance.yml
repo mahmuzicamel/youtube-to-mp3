@@ -1,0 +1,212 @@
+name: Performance Tests
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'  # Weekly on Sunday at 3 AM
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: 'Test duration in minutes'
+        required: false
+        default: '10'
+      concurrent_users:
+        description: 'Number of concurrent users'
+        required: false
+        default: '50'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  load-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install locust pytest
+
+    - name: Start application
+      run: |
+        python youtube-to-mp3.py &
+        APP_PID=$!
+        echo "APP_PID=$APP_PID" >> $GITHUB_ENV
+        
+        # Wait for app to start
+        sleep 10
+        curl -f http://localhost:8000/health || exit 1
+
+    - name: Run load tests
+      run: |
+        # Create a simple locustfile for load testing
+        cat > locustfile.py << EOF
+        from locust import HttpUser, task, between
+        import json
+
+        class YouTubeToMp3User(HttpUser):
+            wait_time = between(1, 3)
+
+            @task
+            def health_check(self):
+                self.client.get("/health")
+
+            @task(3)
+            def download_audio(self):
+                # Use a short public domain video for testing
+                payload = {
+                    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                }
+                headers = {"Content-Type": "application/json"}
+                
+                with self.client.post(
+                    "/download_audio_post/",
+                    json=payload,
+                    headers=headers,
+                    catch_response=True,
+                    stream=True
+                ) as response:
+                    if response.status_code == 200:
+                        # Don't download the full file, just check headers
+                        response.success()
+                    else:
+                        response.failure(f"Got status code {response.status_code}")
+        EOF
+        
+        # Run load test
+        DURATION=${{ github.event.inputs.duration || '10' }}
+        USERS=${{ github.event.inputs.concurrent_users || '50' }}
+        
+        locust -f locustfile.py --headless \
+          --users $USERS \
+          --spawn-rate 10 \
+          --run-time ${DURATION}m \
+          --host http://localhost:8000 \
+          --html performance-report.html
+
+    - name: Upload performance report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: performance-report
+        path: performance-report.html
+
+    - name: Stop application
+      if: always()
+      run: |
+        kill $APP_PID || true
+
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-benchmark
+
+    - name: Run benchmark tests
+      run: |
+        # Create benchmark tests
+        mkdir -p tests/benchmark
+        
+        cat > tests/benchmark/test_performance.py << EOF
+        import pytest
+        from fastapi.testclient import TestClient
+        from youtube_to_mp3 import app
+
+        client = TestClient(app)
+
+        @pytest.mark.benchmark(group="api")
+        def test_health_endpoint_performance(benchmark):
+            result = benchmark(client.get, "/health")
+            assert result.status_code == 200
+
+        @pytest.mark.benchmark(group="validation")
+        def test_url_validation_performance(benchmark):
+            def validate_url():
+                return client.post(
+                    "/download_audio_post/",
+                    json={"url": "invalid-url"}
+                )
+            
+            result = benchmark(validate_url)
+            assert result.status_code == 422
+        EOF
+        
+        # Run benchmark tests
+        pytest tests/benchmark/ --benchmark-only --benchmark-json=benchmark-results.json
+
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v3
+      with:
+        name: benchmark-results
+        path: benchmark-results.json
+
+  memory-profiling:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install memory-profiler psutil
+
+    - name: Run memory profiling
+      run: |
+        # Create memory profiling script
+        cat > memory_profile.py << EOF
+        from memory_profiler import profile
+        import sys
+        import os
+        sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+        from youtube_to_mp3 import app
+        from fastapi.testclient import TestClient
+
+        @profile
+        def test_memory_usage():
+            client = TestClient(app)
+            
+            # Simulate multiple requests
+            for i in range(100):
+                response = client.get("/health")
+                assert response.status_code == 200
+                
+                if i % 10 == 0:
+                    print(f"Completed {i} requests")
+
+        if __name__ == "__main__":
+            test_memory_usage()
+        EOF
+        
+        # Run memory profiling
+        python memory_profile.py > memory-profile.txt 2>&1
+
+    - name: Upload memory profile
+      uses: actions/upload-artifact@v3
+      with:
+        name: memory-profile
+        path: memory-profile.txt
