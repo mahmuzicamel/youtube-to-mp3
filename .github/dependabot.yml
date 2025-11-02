@@ -41,9 +41,6 @@ updates:
       - "dependencies"
       - "docker"
     target-branch: "main"
-    ignore:
-      - dependency-name: "python"
-        versions: ["3.14*", "3.15*"]  # Ignore bleeding edge versions
 
   # GitHub Actions dependencies
   - package-ecosystem: "github-actions"
