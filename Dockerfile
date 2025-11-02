@@ -7,11 +7,16 @@ WORKDIR /app
 # Install system dependencies and security updates
 RUN apt-get update && apt-get install -y \
     ffmpeg \
+    build-essential \
+    gcc \
     && apt-get upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* \
     && rm -rf /var/tmp/*
+
+# Upgrade pip first
+RUN pip install --no-cache-dir --upgrade pip
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
