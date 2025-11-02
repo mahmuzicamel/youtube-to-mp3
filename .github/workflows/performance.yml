@@ -37,7 +37,7 @@ jobs:
 
     - name: Start application
       run: |
-        python youtube-to-mp3.py &
+        python youtube_to_mp3.py &
         APP_PID=$!
         echo "APP_PID=$APP_PID" >> $GITHUB_ENV
         

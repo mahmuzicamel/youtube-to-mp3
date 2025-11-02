@@ -144,8 +144,8 @@ if [[ "$RUN_ALL" == true ]]; then
 fi
 
 # Check if we're in the right directory
-if [[ ! -f "youtube-to-mp3.py" ]]; then
-    print_error "youtube-to-mp3.py not found. Please run from the project root directory."
+if [[ ! -f "youtube_to_mp3.py" ]]; then
+    print_error "youtube_to_mp3.py not found. Please run from the project root directory."
     exit 1
 fi
 
