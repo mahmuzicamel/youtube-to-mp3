@@ -32,7 +32,7 @@ jobs:
         version: '3.12.0'
 
     - name: Configure kubectl
-      uses: azure/k8s-set-context@v3
+      uses: azure/k8s-set-context@v4
       with:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBE_CONFIG_STAGING }}
@@ -83,7 +83,7 @@ jobs:
         version: '3.12.0'
 
     - name: Configure kubectl
-      uses: azure/k8s-set-context@v3
+      uses: azure/k8s-set-context@v4
       with:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBE_CONFIG_PRODUCTION }}
@@ -163,7 +163,7 @@ jobs:
     
     steps:
     - name: Configure kubectl
-      uses: azure/k8s-set-context@v3
+      uses: azure/k8s-set-context@v4
       with:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBE_CONFIG_PRODUCTION }}
