@@ -13,5 +13,5 @@ requests==2.31.0
 
 # For mocking and test utilities
 responses==0.24.1
-freezegun==1.2.2
+freezegun==1.5.5
 factory-boy==3.3.0
