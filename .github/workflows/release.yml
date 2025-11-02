@@ -123,12 +123,12 @@ jobs:
 
     - name: Update Chart version
       run: |
-        sed -i "s/version: .*/version: ${{ steps.version.outputs.version }}/" helm-chart/Chart.yaml
-        sed -i "s/appVersion: .*/appVersion: ${{ steps.version.outputs.version }}/" helm-chart/Chart.yaml
+        sed -i "s/version: .*/version: ${{ steps.version.outputs.version }}/" helm-chart/youtube-to-mp3/Chart.yaml
+        sed -i "s/appVersion: .*/appVersion: ${{ steps.version.outputs.version }}/" helm-chart/youtube-to-mp3/Chart.yaml
 
     - name: Package Helm chart
       run: |
-        helm package helm-chart/ --destination ./
+        helm package helm-chart/youtube-to-mp3/ --destination ./
 
     - name: Upload Helm chart to release
       uses: actions/upload-release-asset@v1
@@ -185,7 +185,7 @@ jobs:
         output: 'trivy-results.sarif'
 
     - name: Upload Trivy scan results
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: 'trivy-results.sarif'
 

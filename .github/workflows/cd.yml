@@ -10,7 +10,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  HELM_CHART_PATH: helm-chart
+  HELM_CHART_PATH: helm-chart/youtube-to-mp3
 
 jobs:
   deploy-staging:

@@ -79,7 +79,7 @@ jobs:
       run: safety check --json
 
     - name: Run bandit security scan
-      run: bandit -r . -f json
+      run: bandit -r . -f json --configfile .bandit
 
   build:
     needs: [test, security-scan]
@@ -138,10 +138,10 @@ jobs:
 
     - name: Lint Helm chart
       run: |
-        helm lint helm-chart/
-        helm template test helm-chart/ --debug --dry-run
+        helm lint helm-chart/youtube-to-mp3/
+        helm template test helm-chart/youtube-to-mp3/ --debug --dry-run
 
     - name: Validate Kubernetes manifests
       run: |
-        helm template test helm-chart/ | kubectl apply --dry-run=client -f -
+        helm template test helm-chart/youtube-to-mp3/ | kubectl apply --dry-run=client -f -
       continue-on-error: true
