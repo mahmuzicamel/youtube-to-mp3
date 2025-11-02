@@ -93,7 +93,7 @@ jobs:
           --html performance-report.html
 
     - name: Upload performance report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: performance-report
@@ -153,7 +153,7 @@ jobs:
         pytest tests/benchmark/ --benchmark-only --benchmark-json=benchmark-results.json
 
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: benchmark-results
         path: benchmark-results.json
@@ -206,7 +206,7 @@ jobs:
         python memory_profile.py > memory-profile.txt 2>&1
 
     - name: Upload memory profile
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: memory-profile
         path: memory-profile.txt
