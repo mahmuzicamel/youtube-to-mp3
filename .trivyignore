@@ -1,0 +1,12 @@
+# Trivy ignore file for known/accepted vulnerabilities
+
+# libsndfile1 vulnerabilities - Audio processing library
+# These are HIGH severity but have fix_deferred status
+# Impact: Limited since we only process YouTube audio, not user-uploaded files
+# CVE-2022-33064: off-by-one error in wav_read_header
+# CVE-2025-52194: buffer overflow in IRCAM audio files
+CVE-2022-33064
+CVE-2025-52194
+
+# Add future known issues here with justification
+# Format: CVE-YYYY-NNNNN
