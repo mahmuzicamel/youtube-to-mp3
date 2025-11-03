@@ -11,6 +11,11 @@ psutil>=5.9.0,<8.0.0
 fastapi>=0.120.0,<1.0.0
 requests>=2.31.0,<3.0.0
 
+# Core application dependencies for testing
+pytubefix>=10.2.0,<11.0.0
+moviepy>=1.0.3,<3.0.0
+uvicorn>=0.24.0,<1.0.0
+
 # For mocking and test utilities
 responses>=0.24.0,<1.0.0
 freezegun>=1.5.0,<2.0.0

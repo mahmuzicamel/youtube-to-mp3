@@ -4,7 +4,15 @@ from tempfile import NamedTemporaryFile
 
 from pytubefix import YouTube
 from pytubefix.helpers import reset_cache
-from moviepy import AudioFileClip
+try:
+    # Try MoviePy v2.x import first
+    from moviepy import AudioFileClip
+except ImportError:
+    try:
+        # Fall back to MoviePy v1.x import
+        from moviepy.editor import AudioFileClip
+    except ImportError as e:
+        raise ImportError(f"Could not import AudioFileClip from moviepy: {e}")
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
