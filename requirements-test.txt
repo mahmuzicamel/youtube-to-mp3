@@ -1,17 +1,17 @@
 # Test dependencies
-pytest==8.4.2
-pytest-asyncio==0.21.1
-pytest-cov==4.1.0
-pytest-xdist==3.8.0
-pytest-mock==3.15.1
-httpx==0.25.2
-psutil==7.1.3
+pytest>=7.4.0,<9.0.0
+pytest-asyncio>=0.21.0,<1.0.0
+pytest-cov>=4.0.0,<5.0.0
+pytest-xdist>=3.0.0,<4.0.0
+pytest-mock>=3.10.0,<4.0.0
+httpx>=0.25.0,<1.0.0
+psutil>=5.9.0,<8.0.0
 
-# For testing FastAPI
-fastapi[all]==0.120.4
-requests==2.32.5
+# For testing FastAPI (use basic version without extras for compatibility)
+fastapi>=0.120.0,<1.0.0
+requests>=2.31.0,<3.0.0
 
 # For mocking and test utilities
-responses==0.25.8
-freezegun==1.5.5
-factory-boy==3.3.3
+responses>=0.24.0,<1.0.0
+freezegun>=1.5.0,<2.0.0
+factory-boy>=3.3.0,<4.0.0
