@@ -12,6 +12,6 @@ fastapi[all]==0.120.4
 requests==2.32.5
 
 # For mocking and test utilities
-responses==0.24.1
+responses==0.25.8
 freezegun==1.2.2
 factory-boy==3.3.0
