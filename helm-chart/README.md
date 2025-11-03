@@ -144,7 +144,7 @@ Once deployed, you can access the API:
 2. **ReDoc**: `http://your-domain/redoc`
 3. **Convert YouTube to MP3**: 
    ```bash
-   curl -X POST "http://your-domain/download_audio_post/" \
+   curl -X POST "http://your-domain/convert/" \
      -H "Content-Type: application/json" \
      -d '{"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}' \
      --output audio.mp3

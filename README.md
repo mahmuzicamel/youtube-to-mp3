@@ -118,7 +118,7 @@ helm install youtube-to-mp3 helm-chart/youtube-to-mp3/
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/download_audio_post/` | Convert YouTube video to MP3 |
+| POST | `/convert/` | Convert YouTube video to MP3 |
 | GET | `/docs` | Interactive API documentation |
 | GET | `/redoc` | Alternative API documentation |
 
@@ -126,7 +126,7 @@ helm install youtube-to-mp3 helm-chart/youtube-to-mp3/
 
 **Request:**
 ```bash
-curl -X POST "http://localhost:8000/download_audio_post/" \
+curl -X POST "http://localhost:8000/convert/" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}' \
   --output audio.mp3
@@ -154,7 +154,7 @@ curl -X POST "http://localhost:8000/download_audio_post/" \
 ### Example with JavaScript
 
 ```javascript
-const response = await fetch('http://localhost:8000/download_audio_post/', {
+const response = await fetch('http://localhost:8000/convert/', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ if (response.ok) {
 import requests
 
 response = requests.post(
-    'http://localhost:8000/download_audio_post/',
+    'http://localhost:8000/convert/',
     json={'url': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'}
 )
 

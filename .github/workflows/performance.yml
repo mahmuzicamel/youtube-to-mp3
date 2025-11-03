@@ -68,7 +68,7 @@ jobs:
                 headers = {"Content-Type": "application/json"}
                 
                 with self.client.post(
-                    "/download_audio_post/",
+                    "/convert/",
                     json=payload,
                     headers=headers,
                     catch_response=True,
@@ -141,7 +141,7 @@ jobs:
         def test_url_validation_performance(benchmark):
             def validate_url():
                 return client.post(
-                    "/download_audio_post/",
+                    "/convert/",
                     json={"url": "invalid-url"}
                 )
             

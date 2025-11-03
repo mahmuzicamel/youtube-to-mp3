@@ -27,7 +27,7 @@
    - ReDoc: http://your-app-url/redoc
 
 3. To use the API:
-   Send a POST request to /download_audio_post/ with JSON body:
+   Send a POST request to /convert/ with JSON body:
    {
      "url": "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
    }

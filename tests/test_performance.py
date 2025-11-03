@@ -35,7 +35,7 @@ class TestPerformance:
         start_time = time.time()
         
         response = client.post(
-            "/download_audio_post/",
+            "/convert/",
             json={"url": "invalid-url"}
         )
         
@@ -51,7 +51,7 @@ class TestPerformance:
         start_time = time.time()
         
         response = client.post(
-            "/download_audio_post/",
+            "/convert/",
             json={}
         )
         
@@ -67,7 +67,7 @@ class TestPerformance:
         def make_request():
             start_time = time.time()
             response = client.post(
-                "/download_audio_post/",
+                "/convert/",
                 json={"url": "invalid-url"}
             )
             end_time = time.time()
@@ -112,7 +112,7 @@ class TestPerformance:
         # Make multiple requests
         for i in range(50):
             response = client.post(
-                "/download_audio_post/",
+                "/convert/",
                 json={"url": "invalid-url"}
             )
             assert response.status_code == 500
@@ -132,7 +132,7 @@ class TestPerformance:
         """Test that requests don't hang indefinitely"""
         # Test with an invalid URL that should fail quickly
         response = client.post(
-            "/download_audio_post/",
+            "/convert/",
             json={"url": "https://www.youtube.com/watch?v=invalid-video-id-12345"},
             timeout=10  # 10 second timeout should be sufficient for error response
         )
@@ -156,7 +156,7 @@ class TestLoadTesting:
             start_time = time.time()
             try:
                 response = client.post(
-                    "/download_audio_post/",
+                    "/convert/",
                     json={"url": f"invalid-url-{request_id}"}
                 )
                 success = response.status_code == 500
