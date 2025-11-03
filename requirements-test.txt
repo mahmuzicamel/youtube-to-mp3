@@ -9,7 +9,7 @@ psutil==5.9.6
 
 # For testing FastAPI
 fastapi[all]==0.104.1
-requests==2.31.0
+requests==2.32.5
 
 # For mocking and test utilities
 responses==0.24.1
