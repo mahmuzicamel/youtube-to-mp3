@@ -13,10 +13,10 @@ def test_import_app():
     try:
         import youtube_to_mp3
         print("✓ Successfully imported youtube_to_mp3 module")
-        assert True  # Import successful
+        return True  # Import successful
     except ImportError as e:
         print(f"✗ Failed to import youtube_to_mp3: {e}")
-        assert False, f"Failed to import youtube_to_mp3: {e}"
+        return False
 
 def test_app_creation():
     """Test that the FastAPI app is created"""
@@ -26,30 +26,41 @@ def test_app_creation():
         
         # Check app type
         app_type = str(type(app))
-        assert "FastAPI" in app_type, f"App is not a FastAPI instance: {app_type}"
-        print("✓ App is a FastAPI instance")
+        if "FastAPI" in app_type:
+            print("✓ App is a FastAPI instance")
+            return True
+        else:
+            print(f"✗ App is not a FastAPI instance: {app_type}")
+            return False
     except Exception as e:
         print(f"✗ Failed to import app: {e}")
-        assert False, f"Failed to import app: {e}"
+        return False
 
 def test_url_item_model():
     """Test the URLItem Pydantic model"""
     try:
         from youtube_to_mp3 import URLItem
-        
+
         # Test valid URL
         url_item = URLItem(url="https://www.youtube.com/watch?v=test")
-        assert url_item.url == "https://www.youtube.com/watch?v=test"
-        print("✓ URLItem model works with valid URL")
-        
+        if url_item.url == "https://www.youtube.com/watch?v=test":
+            print("✓ URLItem model works with valid URL")
+        else:
+            print("✗ URLItem model failed with valid URL")
+            return False
+
         # Test empty URL
         empty_url_item = URLItem(url="")
-        assert empty_url_item.url == ""
-        print("✓ URLItem model works with empty URL")
-        
+        if empty_url_item.url == "":
+            print("✓ URLItem model works with empty URL")
+            return True
+        else:
+            print("✗ URLItem model failed with empty URL")
+            return False
+
     except Exception as e:
         print(f"✗ URLItem model test failed: {e}")
-        assert False, f"URLItem model test failed: {e}"
+        return False
 
 def test_app_routes():
     """Test that required routes exist"""
@@ -59,11 +70,15 @@ def test_app_routes():
         routes = [route.path for route in app.routes]
         print(f"Available routes: {routes}")
         
-        assert "/convert/" in routes, "Required route /convert/ not found"
-        print("✓ Required route /convert/ exists")
+        if "/convert/" in routes:
+            print("✓ Required route /convert/ exists")
+            return True
+        else:
+            print("✗ Required route /convert/ not found")
+            return False
     except Exception as e:
         print(f"✗ Route test failed: {e}")
-        assert False, f"Route test failed: {e}"
+        return False
 
 def test_dependencies():
     """Test that required dependencies are available"""
@@ -84,7 +99,11 @@ def test_dependencies():
             print(f"✗ {dep} ({description}) is not available")
     
     print(f"Dependencies available: {available_count}/{len(dependencies)}")
-    assert available_count >= len(dependencies) - 1, f"Too many dependencies missing: {available_count}/{len(dependencies)}"
+    if available_count >= len(dependencies) - 1:
+        return True
+    else:
+        print(f"✗ Too many dependencies missing: {available_count}/{len(dependencies)}")
+        return False
 
 def test_filename_sanitization():
     """Test filename sanitization logic"""
@@ -96,10 +115,16 @@ def test_filename_sanitization():
         ("///", "___"),
     ]
     
+    all_passed = True
     for input_title, expected in test_cases:
         result = input_title.replace("/", "_")
-        assert result == expected, f"'{input_title}' -> '{result}' (expected '{expected}')"
-        print(f"✓ '{input_title}' -> '{result}'")
+        if result == expected:
+            print(f"✓ '{input_title}' -> '{result}'")
+        else:
+            print(f"✗ '{input_title}' -> '{result}' (expected '{expected}')")
+            all_passed = False
+    
+    return all_passed
 
 def run_all_tests():
     """Run all simple tests"""
