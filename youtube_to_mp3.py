@@ -4,7 +4,7 @@ from tempfile import NamedTemporaryFile
 
 from pytubefix import YouTube
 from pytubefix.helpers import reset_cache
-from moviepy.editor import AudioFileClip
+from moviepy import AudioFileClip
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel

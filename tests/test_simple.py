@@ -13,10 +13,10 @@ def test_import_app():
     try:
         import youtube_to_mp3
         print("✓ Successfully imported youtube_to_mp3 module")
-        return True
+        assert True  # Import successful
     except ImportError as e:
         print(f"✗ Failed to import youtube_to_mp3: {e}")
-        return False
+        assert False, f"Failed to import youtube_to_mp3: {e}"
 
 def test_app_creation():
     """Test that the FastAPI app is created"""
@@ -26,15 +26,11 @@ def test_app_creation():
         
         # Check app type
         app_type = str(type(app))
-        if "FastAPI" in app_type:
-            print("✓ App is a FastAPI instance")
-            return True
-        else:
-            print(f"✗ App is not a FastAPI instance: {app_type}")
-            return False
+        assert "FastAPI" in app_type, f"App is not a FastAPI instance: {app_type}"
+        print("✓ App is a FastAPI instance")
     except Exception as e:
         print(f"✗ Failed to import app: {e}")
-        return False
+        assert False, f"Failed to import app: {e}"
 
 def test_url_item_model():
     """Test the URLItem Pydantic model"""
@@ -51,10 +47,9 @@ def test_url_item_model():
         assert empty_url_item.url == ""
         print("✓ URLItem model works with empty URL")
         
-        return True
     except Exception as e:
         print(f"✗ URLItem model test failed: {e}")
-        return False
+        assert False, f"URLItem model test failed: {e}"
 
 def test_app_routes():
     """Test that required routes exist"""
@@ -64,15 +59,11 @@ def test_app_routes():
         routes = [route.path for route in app.routes]
         print(f"Available routes: {routes}")
         
-        if "/download_audio_post/" in routes:
-            print("✓ Required route /download_audio_post/ exists")
-            return True
-        else:
-            print("✗ Required route /download_audio_post/ not found")
-            return False
+        assert "/download_audio_post/" in routes, "Required route /download_audio_post/ not found"
+        print("✓ Required route /download_audio_post/ exists")
     except Exception as e:
         print(f"✗ Route test failed: {e}")
-        return False
+        assert False, f"Route test failed: {e}"
 
 def test_dependencies():
     """Test that required dependencies are available"""
@@ -93,7 +84,7 @@ def test_dependencies():
             print(f"✗ {dep} ({description}) is not available")
     
     print(f"Dependencies available: {available_count}/{len(dependencies)}")
-    return available_count >= len(dependencies) - 1  # Allow one missing dependency
+    assert available_count >= len(dependencies) - 1, f"Too many dependencies missing: {available_count}/{len(dependencies)}"
 
 def test_filename_sanitization():
     """Test filename sanitization logic"""
@@ -105,16 +96,10 @@ def test_filename_sanitization():
         ("///", "___"),
     ]
     
-    all_passed = True
     for input_title, expected in test_cases:
         result = input_title.replace("/", "_")
-        if result == expected:
-            print(f"✓ '{input_title}' -> '{result}'")
-        else:
-            print(f"✗ '{input_title}' -> '{result}' (expected '{expected}')")
-            all_passed = False
-    
-    return all_passed
+        assert result == expected, f"'{input_title}' -> '{result}' (expected '{expected}')"
+        print(f"✓ '{input_title}' -> '{result}'")
 
 def run_all_tests():
     """Run all simple tests"""

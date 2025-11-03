@@ -15,10 +15,10 @@ def test_basic_imports():
         import tempfile
         from io import BytesIO
         print("✓ Basic Python modules work")
-        return True
+        assert True  # Imports successful
     except ImportError as e:
         print(f"✗ Basic imports failed: {e}")
-        return False
+        assert False, f"Basic imports failed: {e}"
 
 def test_available_dependencies():
     """Test which dependencies are available"""
@@ -48,7 +48,7 @@ def test_available_dependencies():
     print(f"\nCore dependencies: {core_available}/{len(core_deps)} available")
     print(f"Total dependencies: {sum(available.values())}/{len(dependencies)} available")
     
-    return core_available >= 1  # At least one core dependency
+    assert core_available >= 1, f"At least one core dependency should be available: {core_available}/{len(core_deps)}"
 
 def test_file_structure():
     """Test that required files exist"""
@@ -66,7 +66,7 @@ def test_file_structure():
         else:
             print(f"✗ {file} missing")
     
-    return existing_files == len(required_files)
+    assert existing_files == len(required_files), f"Missing required files: {existing_files}/{len(required_files)}"
 
 def test_app_import_conditional():
     """Test app import if dependencies are available"""
@@ -85,32 +85,24 @@ def test_app_import_conditional():
             print(f"✓ URLItem works: {url_item.url}")
             
             # Test app type
-            if hasattr(app, 'post'):
-                print("✓ App has post method (FastAPI app)")
-                return True
-            else:
-                print("✗ App doesn't seem to be a FastAPI app")
-                return False
+            assert hasattr(app, 'post'), "App doesn't seem to be a FastAPI app"
+            print("✓ App has post method (FastAPI app)")
                 
         except Exception as e:
             print(f"✗ Failed to import app components: {e}")
-            return False
+            assert False, f"Failed to import app components: {e}"
             
     except ImportError:
         print("⚠ FastAPI/Pydantic not available, skipping app import test")
-        return True  # Skip this test if dependencies aren't available
+        # Skip this test if dependencies aren't available - this is acceptable
 
 def test_python_version():
     """Test Python version compatibility"""
     version = sys.version_info
     print(f"Python version: {version.major}.{version.minor}.{version.micro}")
     
-    if version >= (3, 8):
-        print("✓ Python version is compatible (>=3.8)")
-        return True
-    else:
-        print("✗ Python version too old (<3.8)")
-        return False
+    assert version >= (3, 8), f"Python version too old: {version.major}.{version.minor} (requires >=3.8)"
+    print("✓ Python version is compatible (>=3.8)")
 
 def test_filename_sanitization():
     """Test filename sanitization logic"""
@@ -123,16 +115,10 @@ def test_filename_sanitization():
         ("Artist / Song Title", "Artist _ Song Title"),
     ]
     
-    all_passed = True
     for input_title, expected in test_cases:
         result = input_title.replace("/", "_")
-        if result == expected:
-            print(f"✓ '{input_title}' -> '{result}'")
-        else:
-            print(f"✗ '{input_title}' -> '{result}' (expected '{expected}')")
-            all_passed = False
-    
-    return all_passed
+        assert result == expected, f"'{input_title}' -> '{result}' (expected '{expected}')"
+        print(f"✓ '{input_title}' -> '{result}'")
 
 def run_minimal_tests():
     """Run minimal test suite"""
