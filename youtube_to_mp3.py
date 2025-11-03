@@ -21,12 +21,16 @@ app = FastAPI()
 
 reset_cache()
 
+# PoToken mode constants
+POTOKEN_MODE_AUTO = "AUTO"
+POTOKEN_MODE_MANUAL = "MANUAL"
+
 class URLItem(BaseModel):
     url: str
 
 @app.get("/")
 async def status():
-    po_token_mode = os.getenv("PO_TOKEN_MODE", "AUTO").upper()
+    po_token_mode = os.getenv("PO_TOKEN_MODE", POTOKEN_MODE_AUTO).upper()
     po_token_configured = bool(os.getenv("PO_TOKEN"))
     visitor_data_configured = bool(os.getenv("VISITOR_DATA"))
     
@@ -47,10 +51,10 @@ async def convert(url_item: URLItem):
         # Get PoToken configuration from environment variables
         po_token = os.getenv("PO_TOKEN")
         visitor_data = os.getenv("VISITOR_DATA")
-        po_token_mode = os.getenv("PO_TOKEN_MODE", "AUTO").upper()  # AUTO or MANUAL
+        po_token_mode = os.getenv("PO_TOKEN_MODE", POTOKEN_MODE_AUTO).upper()  # AUTO or MANUAL
         
         # Configure YouTube instance based on PoToken settings
-        if po_token_mode == "AUTO":
+        if po_token_mode == POTOKEN_MODE_AUTO:
             # Automatic PoToken generation with WEB client (requires nodejs)
             print(f"Using automatic PoToken generation with WEB client")
             yt = YouTube(
@@ -59,7 +63,7 @@ async def convert(url_item: URLItem):
                 use_oauth=False,
                 allow_oauth_cache=True
             )
-        elif po_token and po_token_mode == "MANUAL":
+        elif po_token and po_token_mode == POTOKEN_MODE_MANUAL:
             # Manual PoToken mode with extracted token and visitor data
             print(f"Using manual PoToken with extracted token")
             if visitor_data:
