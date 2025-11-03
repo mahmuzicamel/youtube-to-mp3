@@ -1,0 +1,66 @@
+# Custom values for dynaforge-youtube-to-mp3 deployment
+replicaCount: 1
+
+image:
+  repository: ghcr.io/mahmuzicamel/youtube-to-mp3
+  pullPolicy: Always
+  tag: "latest"
+
+# No external access needed
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+ingress:
+  enabled: false
+
+# Optimized resources for the Alpine image (723MB)
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# Security context for non-root Alpine container
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+podSecurityContext:
+  fsGroup: 1000
+
+# Health checks for the new /convert/ endpoint
+healthCheck:
+  enabled: true
+  path: /docs
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
+
+# No autoscaling needed for internal use
+autoscaling:
+  enabled: false
+
+# Environment variables (PoToken for YouTube access)
+env:
+  - name: PO_TOKEN
+    value: ""  # Set to manually extracted PoToken if using MANUAL mode
+  - name: VISITOR_DATA
+    value: ""  # Set to visitor data if available (optional for MANUAL mode)
+  - name: PO_TOKEN_MODE
+    value: "AUTO"  # AUTO (uses WEB client) or MANUAL (uses extracted tokens)
+    # Alternative: use a Kubernetes Secret
+    # valueFrom:
+    #   secretKeyRef:
+    #     name: youtube-secrets
+    #     key: po-token

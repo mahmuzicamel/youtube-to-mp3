@@ -24,15 +24,69 @@ reset_cache()
 class URLItem(BaseModel):
     url: str
 
+@app.get("/")
+async def status():
+    po_token_mode = os.getenv("PO_TOKEN_MODE", "AUTO").upper()
+    po_token_configured = bool(os.getenv("PO_TOKEN"))
+    visitor_data_configured = bool(os.getenv("VISITOR_DATA"))
+    
+    return {
+        "message": "YouTube to MP3 Service",
+        "status": "running",
+        "po_token": {
+            "mode": po_token_mode,
+            "po_token_configured": po_token_configured,
+            "visitor_data_configured": visitor_data_configured
+        }
+    }
+
 
 @app.post("/convert/")
 async def convert(url_item: URLItem):
     try:
-        yt = YouTube(
-            url_item.url,
-            use_oauth=False,
-            allow_oauth_cache=True
-        )
+        # Get PoToken configuration from environment variables
+        po_token = os.getenv("PO_TOKEN")
+        visitor_data = os.getenv("VISITOR_DATA")
+        po_token_mode = os.getenv("PO_TOKEN_MODE", "AUTO").upper()  # AUTO or MANUAL
+        
+        # Configure YouTube instance based on PoToken settings
+        if po_token_mode == "AUTO":
+            # Automatic PoToken generation with WEB client (requires nodejs)
+            print(f"Using automatic PoToken generation with WEB client")
+            yt = YouTube(
+                url_item.url,
+                client='WEB',
+                use_oauth=False,
+                allow_oauth_cache=True
+            )
+        elif po_token and po_token_mode == "MANUAL":
+            # Manual PoToken mode with extracted token and visitor data
+            print(f"Using manual PoToken with extracted token")
+            if visitor_data:
+                yt = YouTube(
+                    url_item.url,
+                    use_po_token=True,
+                    po_token=po_token,
+                    visitor_data=visitor_data,
+                    use_oauth=False,
+                    allow_oauth_cache=True
+                )
+            else:
+                yt = YouTube(
+                    url_item.url,
+                    use_po_token=True,
+                    po_token=po_token,
+                    use_oauth=False,
+                    allow_oauth_cache=True
+                )
+        else:
+            # Default mode without PoToken
+            print(f"Using default YouTube client (no PoToken)")
+            yt = YouTube(
+                url_item.url,
+                use_oauth=False,
+                allow_oauth_cache=True
+            )
 
         stream = yt.streams.get_audio_only()
         if not stream:

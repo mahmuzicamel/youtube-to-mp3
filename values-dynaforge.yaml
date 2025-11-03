@@ -1,0 +1,58 @@
+# Custom values for dynaforge-flow deployment
+replicaCount: 1
+
+image:
+  repository: ghcr.io/mahmuzicamel/youtube-to-mp3
+  pullPolicy: Always
+  tag: "latest"
+
+# No external access needed
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+# Disable ingress since no external usage needed
+ingress:
+  enabled: false
+
+# Resource limits for the optimized Alpine image
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# Health checks
+healthCheck:
+  enabled: true
+  path: /docs
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 5
+
+# Security context for Alpine container
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+podSecurityContext:
+  fsGroup: 1000
+
+# Environment specific settings
+env: []
+
+# No persistent storage needed for this use case
+persistence:
+  enabled: false
+
+# No autoscaling needed for internal usage
+autoscaling:
+  enabled: false

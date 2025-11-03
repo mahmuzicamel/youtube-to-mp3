@@ -81,6 +81,8 @@ affinity: {}
 
 # Environment variables
 env: []
+  # - name: PO_TOKEN
+  #   value: "your-youtube-po-token-here"  # YouTube Proof of Origin Token to avoid 403 errors
   # - name: EXAMPLE_VAR
   #   value: "example-value"
 

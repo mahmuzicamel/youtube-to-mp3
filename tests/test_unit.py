@@ -130,6 +130,7 @@ class TestDownloadAudioPost:
         # Assertions
         mock_youtube_class.assert_called_once_with(
             "https://www.youtube.com/watch?v=test",
+            client='WEB',
             use_oauth=False,
             allow_oauth_cache=True
         )
