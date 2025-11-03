@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
 env:
   PYTHON_VERSION: '3.11'
   REGISTRY: ghcr.io
@@ -53,7 +58,7 @@ jobs:
         pytest tests/ -v --cov=. --cov-report=xml --cov-report=html
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
         file: ./coverage.xml
         flags: unittests
@@ -79,7 +84,7 @@ jobs:
       run: safety check --json
 
     - name: Run bandit security scan
-      run: bandit -r . -f json
+      run: bandit -r . -f json --configfile .bandit
 
   build:
     needs: [test, security-scan]
@@ -110,8 +115,8 @@ jobs:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
           type=ref,event=branch
-          type=ref,event=pr
-          type=sha,prefix={{branch}}-
+          type=ref,event=pr,prefix=pr-
+          type=sha,prefix=sha-,format=short
           type=raw,value=latest,enable={{is_default_branch}}
 
     - name: Build and push Docker image
@@ -138,10 +143,10 @@ jobs:
 
     - name: Lint Helm chart
       run: |
-        helm lint helm-chart/
-        helm template test helm-chart/ --debug --dry-run
+        helm lint helm-chart/youtube-to-mp3/
+        helm template test helm-chart/youtube-to-mp3/ --debug --dry-run
 
     - name: Validate Kubernetes manifests
       run: |
-        helm template test helm-chart/ | kubectl apply --dry-run=client -f -
+        helm template test helm-chart/youtube-to-mp3/ | kubectl apply --dry-run=client -f -
       continue-on-error: true

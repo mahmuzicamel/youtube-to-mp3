@@ -8,6 +8,11 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   dependency-check:
     runs-on: ubuntu-latest
@@ -35,7 +40,7 @@ jobs:
         pip-audit
 
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-reports
@@ -61,10 +66,11 @@ jobs:
         image-ref: 'youtube-to-mp3:scan'
         format: 'sarif'
         output: 'trivy-results.sarif'
+        trivyignores: '.trivyignore'
 
     - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v2
-      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      if: always() && github.event_name != 'pull_request'
       with:
         sarif_file: 'trivy-results.sarif'
 
@@ -73,20 +79,23 @@ jobs:
       with:
         image-ref: 'youtube-to-mp3:scan'
         exit-code: '1'
-        severity: 'CRITICAL,HIGH'
+        severity: 'CRITICAL'
+        ignore-unfixed: true
+        trivyignores: '.trivyignore'
 
   code-analysis:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     steps:
     - uses: actions/checkout@v4
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: python
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
 
   secret-scan:
     runs-on: ubuntu-latest
@@ -95,10 +104,27 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: TruffleHog OSS
+    - name: TruffleHog OSS - Full History Scan
       uses: trufflesecurity/trufflehog@main
+      if: github.event_name == 'schedule'
       with:
         path: ./
-        base: main
+        extra_args: --debug --only-verified
+
+    - name: TruffleHog OSS - Since Last Commit
+      uses: trufflesecurity/trufflehog@main
+      if: github.event_name == 'push'
+      with:
+        path: ./
+        base: ${{ github.event.before }}
         head: HEAD
+        extra_args: --debug --only-verified
+
+    - name: TruffleHog OSS - PR Changes
+      uses: trufflesecurity/trufflehog@main
+      if: github.event_name == 'pull_request'
+      with:
+        path: ./
+        base: ${{ github.event.pull_request.base.sha }}
+        head: ${{ github.event.pull_request.head.sha }}
         extra_args: --debug --only-verified

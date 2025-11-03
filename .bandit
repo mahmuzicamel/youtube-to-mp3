@@ -1,0 +1,11 @@
+exclude_dirs:
+  - tests
+  - venv
+  - .venv
+  - env
+  - .env
+  - __pycache__
+  - .pytest_cache
+
+skips:
+  - B101  # Skip assert_used test since asserts are used intentionally in tests

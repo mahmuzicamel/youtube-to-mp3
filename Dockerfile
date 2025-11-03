@@ -1,20 +1,29 @@
-# Use Python 3.11 slim image as base
-FROM python:3.11-slim
+# Use Python 3.12 slim image as base (stable version)
+FROM python:3.14-slim-bookworm
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies required for moviepy and audio processing
+# Install system dependencies and security updates
 RUN apt-get update && apt-get install -y \
     ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+    build-essential \
+    gcc \
+    && apt-get upgrade -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/*
+
+# Upgrade pip first
+RUN pip install --no-cache-dir --upgrade pip
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code
-COPY youtube-to-mp3.py .
+COPY youtube_to_mp3.py .
 
 # Create a non-root user for security
 RUN adduser --disabled-password --gecos '' appuser && \
@@ -25,4 +34,4 @@ USER appuser
 EXPOSE 8000
 
 # Command to run the FastAPI application with uvicorn
-CMD ["uvicorn", "youtube-to-mp3:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "youtube_to_mp3:app", "--host", "0.0.0.0", "--port", "8000"]
