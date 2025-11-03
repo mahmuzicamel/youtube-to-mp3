@@ -4,7 +4,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/mahmuzicamel/youtube-to-mp3
   pullPolicy: Always
-  tag: "latest"
+  tag: "v1.2.0"
 
 # No external access needed
 service:
