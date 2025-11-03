@@ -1,13 +1,14 @@
-# Multi-stage build for smaller final image
-FROM python:3.12-slim-bookworm AS builder
+# Ultra-lightweight build with Alpine Linux
+FROM python:3.12-alpine AS builder
 
 # Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
+RUN apk add --no-cache \
+    build-base \
     gcc \
-    && rm -rf /var/lib/apt/lists/*
+    musl-dev \
+    linux-headers
 
-# Create and activate virtual environment
+# Create virtual environment
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
@@ -17,15 +18,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements-docker.txt
 
 # Production stage
-FROM python:3.12-slim-bookworm
+FROM python:3.12-alpine
 
 # Install only runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /tmp/* \
-    && rm -rf /var/tmp/*
+RUN apk add --no-cache ffmpeg
 
 # Copy virtual environment from builder stage
 COPY --from=builder /opt/venv /opt/venv
@@ -38,7 +34,7 @@ WORKDIR /app
 COPY youtube_to_mp3.py .
 
 # Create a non-root user for security
-RUN adduser --disabled-password --gecos '' --no-create-home appuser && \
+RUN adduser -D -s /bin/sh appuser && \
     chown -R appuser:appuser /app
 USER appuser
 

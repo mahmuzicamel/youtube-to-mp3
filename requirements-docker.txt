@@ -1,0 +1,8 @@
+# Core FastAPI dependencies (minimal for production)
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic>=2.5.0,<3.0.0
+
+# YouTube and video processing
+pytubefix==10.2.1
+moviepy==1.0.3
