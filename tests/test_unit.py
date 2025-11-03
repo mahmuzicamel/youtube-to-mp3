@@ -15,13 +15,11 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
-    from youtube_to_mp3 import app, URLItem, download_audio_post
-except ImportError as e:
-    # Skip all tests if we can't import the module
-    pytestmark = pytest.mark.skip(reason=f"Could not import module: {e}")
+    from youtube_to_mp3 import app, URLItem, convert
+except ImportError:
     app = None
     URLItem = None
-    download_audio_post = None
+    convert = None
 
 
 @pytest.mark.unit
@@ -125,8 +123,9 @@ class TestDownloadAudioPost:
         mock_open.return_value.__enter__.return_value = mock_file
         
         # Test the function
+        # Test successful conversion
         url_item = URLItem(url="https://www.youtube.com/watch?v=test")
-        response = await download_audio_post(url_item)
+        response = await convert(url_item)
         
         # Assertions
         mock_youtube_class.assert_called_once_with(
@@ -157,7 +156,7 @@ class TestDownloadAudioPost:
             url_item = URLItem(url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")  # Valid YouTube URL format
             
             with pytest.raises(HTTPException) as exc_info:
-                await download_audio_post(url_item)
+                await convert(url_item)
             
             # After library updates, the mock behavior changed slightly
             # The function correctly detects the error condition and raises an exception
@@ -173,7 +172,7 @@ class TestDownloadAudioPost:
         url_item = URLItem(url="https://www.youtube.com/watch?v=test")
         
         with pytest.raises(HTTPException) as exc_info:
-            await download_audio_post(url_item)
+            await convert(url_item)
         
         assert exc_info.value.status_code == 500
         assert "Fehler: YouTube API Error" in str(exc_info.value.detail)
@@ -190,7 +189,7 @@ class TestDownloadAudioPost:
         url_item = URLItem(url="https://www.youtube.com/watch?v=test")
         
         with pytest.raises(HTTPException) as exc_info:
-            await download_audio_post(url_item)
+            await convert(url_item)
         
         assert exc_info.value.status_code == 500
         assert "Fehler: MoviePy Error" in str(exc_info.value.detail)
@@ -216,7 +215,7 @@ class TestApp:
     def test_app_routes(self):
         """Test that required routes exist"""
         routes = [route.path for route in app.routes]
-        assert "/download_audio_post/" in routes
+        assert "/convert/" in routes
 
 
 if __name__ == "__main__":

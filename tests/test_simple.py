@@ -59,8 +59,8 @@ def test_app_routes():
         routes = [route.path for route in app.routes]
         print(f"Available routes: {routes}")
         
-        assert "/download_audio_post/" in routes, "Required route /download_audio_post/ not found"
-        print("✓ Required route /download_audio_post/ exists")
+        assert "/convert/" in routes, "Required route /convert/ not found"
+        print("✓ Required route /convert/ exists")
     except Exception as e:
         print(f"✗ Route test failed: {e}")
         assert False, f"Route test failed: {e}"

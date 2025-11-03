@@ -39,7 +39,7 @@ class TestAPIIntegration:
     def test_download_audio_invalid_url(self, client):
         """Test API with invalid URL"""
         response = client.post(
-            "/download_audio_post/",
+            "/convert/",
             json={"url": "not-a-valid-url"}
         )
         assert response.status_code == 500  # Should return server error
@@ -47,7 +47,7 @@ class TestAPIIntegration:
     def test_download_audio_empty_url(self, client):
         """Test API with empty URL"""
         response = client.post(
-            "/download_audio_post/",
+            "/convert/",
             json={"url": ""}
         )
         assert response.status_code == 500  # Should return server error
@@ -55,7 +55,7 @@ class TestAPIIntegration:
     def test_download_audio_missing_url(self, client):
         """Test API with missing URL parameter"""
         response = client.post(
-            "/download_audio_post/",
+            "/convert/",
             json={}
         )
         assert response.status_code == 422  # Validation error
@@ -63,7 +63,7 @@ class TestAPIIntegration:
     def test_download_audio_invalid_json(self, client):
         """Test API with invalid JSON"""
         response = client.post(
-            "/download_audio_post/",
+            "/convert/",
             data="invalid json"
         )
         assert response.status_code == 422  # Validation error
@@ -71,7 +71,7 @@ class TestAPIIntegration:
     def test_download_audio_wrong_content_type(self, client):
         """Test API with wrong content type"""
         response = client.post(
-            "/download_audio_post/",
+            "/convert/",
             data="url=https://www.youtube.com/watch?v=test"
         )
         assert response.status_code == 422  # Validation error
@@ -87,7 +87,7 @@ class TestAPIIntegration:
         test_url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"  # Rick Roll - likely to stay
         
         response = client.post(
-            "/download_audio_post/",
+            "/convert/",
             json={"url": test_url},
             timeout=60  # Give it time to download and convert
         )
@@ -118,7 +118,7 @@ class TestAPIIntegration:
         openapi_spec = response.json()
         assert "openapi" in openapi_spec
         assert "paths" in openapi_spec
-        assert "/download_audio_post/" in openapi_spec["paths"]
+        assert "/convert/" in openapi_spec["paths"]
 
 
 @pytest.mark.skipif(app is None, reason="Could not import app")
@@ -133,7 +133,7 @@ class TestAPIResponseFormat:
     
     def test_cors_headers(self, client):
         """Test CORS headers if enabled"""
-        response = client.options("/download_audio_post/")
+        response = client.options("/convert/")
         # This will depend on your CORS configuration
         # Just testing that the request doesn't crash
         assert response.status_code in [200, 405]
@@ -141,7 +141,7 @@ class TestAPIResponseFormat:
     def test_error_response_format(self, client):
         """Test that error responses have correct format"""
         response = client.post(
-            "/download_audio_post/",
+            "/convert/",
             json={"url": "invalid"}
         )
         assert response.status_code == 500

@@ -38,7 +38,7 @@ python3 tests/test_simple.py
 - **Dependencies**: pytest, pytest-mock, pytest-asyncio
 - **What it tests**:
   - URLItem Pydantic model validation
-  - download_audio_post function with mocked YouTube/MoviePy
+  - convert function with mocked YouTube/MoviePy
   - Error handling scenarios
   - File cleanup
   - Response format
@@ -202,7 +202,7 @@ def test_something_specific():
 def test_with_fixture(mock_youtube_success, api_client):
     """Test using predefined fixtures"""
     # Fixtures are automatically provided
-    response = api_client.post("/download_audio_post/", json={"url": "test"})
+    response = api_client.post("/convert/", json={"url": "test"})
     assert response.status_code == 200
 ```
 

@@ -25,8 +25,8 @@ class URLItem(BaseModel):
     url: str
 
 
-@app.post("/download_audio_post/")
-async def download_audio_post(url_item: URLItem):
+@app.post("/convert/")
+async def convert(url_item: URLItem):
     try:
         yt = YouTube(
             url_item.url,
