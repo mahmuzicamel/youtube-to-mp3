@@ -1,5 +1,5 @@
 # Multi-stage build for smaller final image
-FROM python:3.12-slim-bookworm AS builder
+FROM python:3.14-slim-bookworm AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements-docker.txt
 
 # Production stage
-FROM python:3.12-slim-bookworm
+FROM python:3.14-slim-bookworm
 
 # Install only runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

@@ -1,5 +1,5 @@
 # Ultra-lightweight build with Alpine Linux
-FROM python:3.12-alpine AS builder
+FROM python:3.14-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache \
@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements-docker.txt
 
 # Production stage
-FROM python:3.12-alpine
+FROM python:3.14-alpine
 
 # Install only runtime dependencies
 RUN apk add --no-cache ffmpeg
