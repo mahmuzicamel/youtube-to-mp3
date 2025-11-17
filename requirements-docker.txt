@@ -1,5 +1,5 @@
 # Core FastAPI dependencies (minimal for production)
-fastapi==0.104.1
+fastapi==0.121.2
 uvicorn==0.38.0
 pydantic>=2.5.0,<3.0.0
 
