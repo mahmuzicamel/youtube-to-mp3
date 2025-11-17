@@ -1,4 +1,4 @@
-fastapi==0.104.1
+fastapi==0.121.2
 uvicorn[standard]==0.24.0
 pytubefix==10.2.1
 moviepy==1.0.3
